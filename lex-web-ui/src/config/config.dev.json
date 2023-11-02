@@ -24,7 +24,7 @@
   },
   "ui": {
     "parentOrigin": "",
-    "toolbarTitle": "Order Flowers",
+    "toolbarTitle": "Amazon Lex 2",
     "toolbarLogo": "",
     "positiveFeedbackIntent": "Thumbs up",
     "negativeFeedbackIntent": "Thumbs down",
@@ -45,13 +45,13 @@
     "enableLiveChat": false
   },
   "connect": {
-    "contactFlowId" : "",
-    "instanceId" : "",
-    "apiGatewayEndpoint" : "",
+    "contactFlowId": "",
+    "instanceId": "",
+    "apiGatewayEndpoint": "",
     "waitingForAgentMessage": "Thanks for waiting. An agent will be with you when available.",
     "waitingForAgentMessageIntervalSeconds": 60,
     "agentJoinedMessage": "{Agent} has joined.",
-    "agentLeftMessage": "{Agent} has left.", 
+    "agentLeftMessage": "{Agent} has left.",
     "chatEndedMessage": "Chat ended.",
     "attachChatTranscript": true
   },

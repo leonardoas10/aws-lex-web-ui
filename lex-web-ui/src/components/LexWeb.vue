@@ -1,7 +1,5 @@
 <template>
-  <v-app id="lex-web"
-    v-bind:ui-minimized="isUiMinimized"
-  >
+  <v-app id="lex-web" v-bind:ui-minimized="isUiMinimized">
     <min-button
       v-bind:toolbar-color="toolbarColor"
       v-bind:is-ui-minimized="isUiMinimized"
@@ -26,16 +24,14 @@
       transition="fade-transition"
     ></toolbar-container>
 
-    <v-content
-      v-if="!isUiMinimized"
-    >
+    <v-content v-if="!isUiMinimized">
       <v-container
         class="message-list-container"
         v-bind:class="`toolbar-height-${toolbarHeightClassSuffix}`"
-        fluid pa-0
+        fluid
+        pa-0
       >
-        <message-list v-if="!isUiMinimized"
-        ></message-list>
+        <message-list v-if="!isUiMinimized"></message-list>
       </v-container>
     </v-content>
 
@@ -45,11 +41,7 @@
       v-bind:text-input-placeholder="textInputPlaceholder"
       v-bind:initial-speech-instruction="initialSpeechInstruction"
     ></input-container>
-    <div
-      v-if="isSFXOn"
-      id="sound"
-      aria-hidden="true"
-    />
+    <div v-if="isSFXOn" id="sound" aria-hidden="true" />
   </v-app>
 </template>
 
@@ -69,22 +61,24 @@ License for the specific language governing permissions and limitations under th
 
 /* eslint no-console: ["error", { allow: ["warn", "error", "info"] }] */
 
-import MinButton from '@/components/MinButton';
-import ToolbarContainer from '@/components/ToolbarContainer';
-import MessageList from '@/components/MessageList';
-import InputContainer from '@/components/InputContainer';
-import LexRuntime from 'aws-sdk/clients/lexruntime';
-import LexRuntimeV2 from 'aws-sdk/clients/lexruntimev2';
+import MinButton from "@/components/MinButton";
+import ToolbarContainer from "@/components/ToolbarContainer";
+import MessageList from "@/components/MessageList";
+import InputContainer from "@/components/InputContainer";
+import LexRuntime from "aws-sdk/clients/lexruntime";
+import LexRuntimeV2 from "aws-sdk/clients/lexruntimev2";
 
-import { Config as AWSConfig, CognitoIdentityCredentials }
-  from 'aws-sdk/global';
+import {
+  Config as AWSConfig,
+  CognitoIdentityCredentials,
+} from "aws-sdk/global";
 
 export default {
-  name: 'lex-web',
+  name: "lex-web",
   data() {
     return {
-      userNameValue: '',
-      toolbarHeightClassSuffix: 'md',
+      userNameValue: "",
+      toolbarHeightClassSuffix: "md",
     };
   },
   components: {
@@ -135,9 +129,11 @@ export default {
     },
     isMobile() {
       const mobileResolution = 900;
-      return (this.$vuetify.breakpoint.smAndDown &&
-        'navigator' in window && navigator.maxTouchPoints > 0 &&
-        'screen' in window &&
+      return (
+        this.$vuetify.breakpoint.smAndDown &&
+        "navigator" in window &&
+        navigator.maxTouchPoints > 0 &&
+        "screen" in window &&
         (window.screen.height < mobileResolution ||
           window.screen.width < mobileResolution)
       );
@@ -146,7 +142,7 @@ export default {
   watch: {
     // emit lex state on changes
     lexState() {
-      this.$emit('updateLexState', this.lexState);
+      this.$emit("updateLexState", this.lexState);
       this.setFocusIfEnabled();
     },
   },
@@ -154,21 +150,23 @@ export default {
     // override default vuetify vertical overflow on non-mobile devices
     // hide vertical scrollbars
     if (!this.isMobile) {
-      document.documentElement.style.overflowY = 'hidden';
+      document.documentElement.style.overflowY = "hidden";
     }
 
     this.initConfig()
-      .then(() => Promise.all([
-        this.$store.dispatch(
-          'initCredentials',
-          this.$lexWebUi.awsConfig.credentials,
-        ),
-        this.$store.dispatch('initRecorder'),
-        this.$store.dispatch(
-          'initBotAudio',
-          (window.Audio) ? new Audio() : null,
-        ),
-      ]))
+      .then(() =>
+        Promise.all([
+          this.$store.dispatch(
+            "initCredentials",
+            this.$lexWebUi.awsConfig.credentials
+          ),
+          this.$store.dispatch("initRecorder"),
+          this.$store.dispatch(
+            "initBotAudio",
+            window.Audio ? new Audio() : null
+          ),
+        ])
+      )
       .then(() => {
         // This processing block adjusts the LexRunTime client dynamically based on the
         // currently configured region and poolId. Both values by this time should be
@@ -181,37 +179,42 @@ export default {
 
         // Check for required config values (region & poolId)
         if (!this.$store.state || !this.$store.state.config) {
-          return Promise.reject(new Error('no config found'))
+          return Promise.reject(new Error("no config found"));
         }
-        const region = this.$store.state.config.region ? this.$store.state.config.region : this.$store.state.config.cognito.region;
+        const region = this.$store.state.config.region
+          ? this.$store.state.config.region
+          : this.$store.state.config.cognito.region;
         if (!region) {
-          return Promise.reject(new Error('no region found in config or config.cognito'))
+          return Promise.reject(
+            new Error("no region found in config or config.cognito")
+          );
         }
         const poolId = this.$store.state.config.cognito.poolId;
         if (!poolId) {
-          return Promise.reject(new Error('no cognito.poolId found in config'))
+          return Promise.reject(new Error("no cognito.poolId found in config"));
         }
 
-        const AWSConfigConstructor = (window.AWS && window.AWS.Config) ?
-          window.AWS.Config :
-          AWSConfig;
+        const AWSConfigConstructor =
+          window.AWS && window.AWS.Config ? window.AWS.Config : AWSConfig;
 
         const CognitoConstructor =
-          (window.AWS && window.AWS.CognitoIdentityCredentials) ?
-            window.AWS.CognitoIdentityCredentials :
-            CognitoIdentityCredentials;
+          window.AWS && window.AWS.CognitoIdentityCredentials
+            ? window.AWS.CognitoIdentityCredentials
+            : CognitoIdentityCredentials;
 
-        const LexRuntimeConstructor = (window.AWS && window.AWS.LexRuntime) ?
-          window.AWS.LexRuntime :
-          LexRuntime;
+        const LexRuntimeConstructor =
+          window.AWS && window.AWS.LexRuntime
+            ? window.AWS.LexRuntime
+            : LexRuntime;
 
-        const LexRuntimeConstructorV2 = (window.AWS && window.AWS.LexRuntimeV2) ?
-          window.AWS.LexRuntimeV2 :
-          LexRuntimeV2;
+        const LexRuntimeConstructorV2 =
+          window.AWS && window.AWS.LexRuntimeV2
+            ? window.AWS.LexRuntimeV2
+            : LexRuntimeV2;
 
         const credentials = new CognitoConstructor(
           { IdentityPoolId: poolId },
-          { region: region },
+          { region: region }
         );
 
         const awsConfig = new AWSConfigConstructor({
@@ -220,73 +223,84 @@ export default {
         });
 
         this.$lexWebUi.lexRuntimeClient = new LexRuntimeConstructor(awsConfig);
-        this.$lexWebUi.lexRuntimeV2Client = new LexRuntimeConstructorV2(awsConfig);
+        this.$lexWebUi.lexRuntimeV2Client = new LexRuntimeConstructorV2(
+          awsConfig
+        );
         /* eslint-disable no-console */
-        console.log(`lexRuntimeV2Client : ${JSON.stringify(this.$lexWebUi.lexRuntimeV2Client)}`);
+        // console.log(
+        //   `lexRuntimeV2Client leonardo : ${JSON.stringify(
+        //     this.$lexWebUi.lexRuntimeV2Client
+        //   )}`
+        // );
 
         const promises = [
-          this.$store.dispatch('initMessageList'),
-          this.$store.dispatch('initPollyClient', this.$lexWebUi.pollyClient),
-          this.$store.dispatch('initLexClient', {
-            v1client: this.$lexWebUi.lexRuntimeClient, v2client: this.$lexWebUi.lexRuntimeV2Client,
+          this.$store.dispatch("initMessageList"),
+          this.$store.dispatch("initPollyClient", this.$lexWebUi.pollyClient),
+          this.$store.dispatch("initLexClient", {
+            v1client: this.$lexWebUi.lexRuntimeClient,
+            v2client: this.$lexWebUi.lexRuntimeV2Client,
           }),
         ];
-        console.info('CONFIG : ', this.$store.state.config);
-        if (this.$store.state && this.$store.state.config &&
-            this.$store.state.config.ui.enableLiveChat) {
-          promises.push(this.$store.dispatch('initLiveChat'));
+        // console.info("CONFIG : ", this.$store.state.config);
+        if (
+          this.$store.state &&
+          this.$store.state.config &&
+          this.$store.state.config.ui.enableLiveChat
+        ) {
+          promises.push(this.$store.dispatch("initLiveChat"));
         }
         return Promise.all(promises);
       })
       .then(() => {
         document.title = this.$store.state.config.ui.pageTitle;
       })
-      .then(() => (
-        (this.$store.state.isRunningEmbedded) ?
-          this.$store.dispatch(
-            'sendMessageToParentWindow',
-            { event: 'ready' },
-          ) :
-          Promise.resolve()
-      ))
+      .then(() =>
+        this.$store.state.isRunningEmbedded
+          ? this.$store.dispatch("sendMessageToParentWindow", {
+              event: "ready",
+            })
+          : Promise.resolve()
+      )
       .then(() => {
         if (this.$store.state.config.ui.saveHistory === true) {
           this.$store.subscribe((mutation, state) => {
-            sessionStorage.setItem('store', JSON.stringify(state));
+            sessionStorage.setItem("store", JSON.stringify(state));
           });
         }
       })
       .then(() => {
         console.info(
-          'successfully initialized lex web ui version: ',
-          this.$store.state.version,
+          "successfully initialized lex web ui version: ",
+          this.$store.state.version
         );
         // after slight delay, send in initial utterance if it is defined.
         // waiting for credentials to settle down a bit.
         if (!this.$store.state.config.iframe.shouldLoadIframeMinimized) {
-          setTimeout(() => this.$store.dispatch('sendInitialUtterance'), 500);
-          this.$store.commit('setInitialUtteranceSent', true);
+          setTimeout(() => this.$store.dispatch("sendInitialUtterance"), 500);
+          this.$store.commit("setInitialUtteranceSent", true);
         }
       })
       .catch((error) => {
-        console.error('could not initialize application while mounting:', error);
+        console.error(
+          "could not initialize application while mounting:",
+          error
+        );
       });
   },
   beforeDestroy() {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('resize', this.onResize, { passive: true });
+    if (typeof window !== "undefined") {
+      window.removeEventListener("resize", this.onResize, { passive: true });
     }
   },
   mounted() {
     if (!this.$store.state.isRunningEmbedded) {
-      this.$store.dispatch(
-        'sendMessageToParentWindow',
-        { event: 'requestTokens' },
-      );
+      this.$store.dispatch("sendMessageToParentWindow", {
+        event: "requestTokens",
+      });
       this.setFocusIfEnabled();
     }
     this.onResize();
-    window.addEventListener('resize', this.onResize, { passive: true });
+    window.addEventListener("resize", this.onResize, { passive: true });
   },
   methods: {
     onResize() {
@@ -298,194 +312,200 @@ export default {
 
       // when running embedded the toolbar is fixed to dense
       if (this.$store.state.isRunningEmbedded) {
-        this.toolbarHeightClassSuffix = 'md';
+        this.toolbarHeightClassSuffix = "md";
         return;
       }
 
       // in full screen the toolbar changes size
       if (innerWidth < 640) {
-        this.toolbarHeightClassSuffix = 'sm';
+        this.toolbarHeightClassSuffix = "sm";
       } else if (innerWidth > 640 && innerWidth < 960) {
-        this.toolbarHeightClassSuffix = 'md';
+        this.toolbarHeightClassSuffix = "md";
       } else {
-        this.toolbarHeightClassSuffix = 'lg';
+        this.toolbarHeightClassSuffix = "lg";
       }
     },
     toggleMinimizeUi() {
-      return this.$store.dispatch('toggleIsUiMinimized');
+      return this.$store.dispatch("toggleIsUiMinimized");
     },
     loginConfirmed(evt) {
-      this.$store.commit('setIsLoggedIn', true);
+      this.$store.commit("setIsLoggedIn", true);
       if (evt.detail && evt.detail.data) {
-        this.$store.commit('setTokens', evt.detail.data);
+        this.$store.commit("setTokens", evt.detail.data);
       } else if (evt.data && evt.data.data) {
-        this.$store.commit('setTokens', evt.data.data);
+        this.$store.commit("setTokens", evt.data.data);
       }
     },
     logoutConfirmed() {
-      this.$store.commit('setIsLoggedIn', false);
-      this.$store.commit('setTokens', {
-        idtokenjwt: '',
-        accesstokenjwt: '',
-        refreshtoken: '',
+      this.$store.commit("setIsLoggedIn", false);
+      this.$store.commit("setTokens", {
+        idtokenjwt: "",
+        accesstokenjwt: "",
+        refreshtoken: "",
       });
     },
     handleRequestLogin() {
-      console.info('request login');
+      console.info("request login");
       if (this.$store.state.isRunningEmbedded) {
-        this.$store.dispatch(
-          'sendMessageToParentWindow',
-          { event: 'requestLogin' },
-        );
+        this.$store.dispatch("sendMessageToParentWindow", {
+          event: "requestLogin",
+        });
       } else {
-        this.$store.dispatch(
-          'sendMessageToParentWindow',
-          { event: 'requestLogin' },
-        );
+        this.$store.dispatch("sendMessageToParentWindow", {
+          event: "requestLogin",
+        });
       }
     },
     handleRequestLogout() {
-      console.info('request logout');
+      console.info("request logout");
       if (this.$store.state.isRunningEmbedded) {
-        this.$store.dispatch(
-          'sendMessageToParentWindow',
-          { event: 'requestLogout' },
-        );
+        this.$store.dispatch("sendMessageToParentWindow", {
+          event: "requestLogout",
+        });
       } else {
-        this.$store.dispatch(
-          'sendMessageToParentWindow',
-          { event: 'requestLogout' },
-        );
+        this.$store.dispatch("sendMessageToParentWindow", {
+          event: "requestLogout",
+        });
       }
     },
     handleRequestLiveChat() {
-      console.info('handleRequestLiveChat');
-      this.$store.dispatch('requestLiveChat');
+      console.info("handleRequestLiveChat");
+      this.$store.dispatch("requestLiveChat");
     },
     handleEndLiveChat() {
-      console.info('LexWeb: handleEndLiveChat');
+      console.info("LexWeb: handleEndLiveChat");
       try {
-        this.$store.dispatch('requestLiveChatEnd');
+        this.$store.dispatch("requestLiveChatEnd");
       } catch (error) {
         console.error(`error requesting disconnect ${error}`);
-        this.$store.dispatch('pushLiveChatMessage', {
-          type: 'agent',
+        this.$store.dispatch("pushLiveChatMessage", {
+          type: "agent",
           text: this.$store.state.config.connect.chatEndedMessage,
         });
-        this.$store.dispatch('liveChatSessionEnded');
+        this.$store.dispatch("liveChatSessionEnded");
       }
     },
     // messages from parent
     messageHandler(evt) {
-      const messageType = this.$store.state.config.ui.hideButtonMessageBubble ? 'button' : 'human';
+      const messageType = this.$store.state.config.ui.hideButtonMessageBubble
+        ? "button"
+        : "human";
       // security check
       if (evt.origin !== this.$store.state.config.ui.parentOrigin) {
-        console.warn('ignoring event - invalid origin:', evt.origin);
+        console.warn("ignoring event - invalid origin:", evt.origin);
         return;
       }
       if (!evt.ports || !Array.isArray(evt.ports) || !evt.ports.length) {
-        console.warn('postMessage not sent over MessageChannel', evt);
+        console.warn("postMessage not sent over MessageChannel", evt);
         return;
       }
       switch (evt.data.event) {
-        case 'ping':
-          console.info('pong - ping received from parent');
+        case "ping":
+          console.info("pong - ping received from parent");
           evt.ports[0].postMessage({
-            event: 'resolve',
+            event: "resolve",
             type: evt.data.event,
           });
           this.setFocusIfEnabled();
           break;
         // received when the parent page has loaded the iframe
-        case 'parentReady':
-          evt.ports[0].postMessage({ event: 'resolve', type: evt.data.event });
+        case "parentReady":
+          evt.ports[0].postMessage({ event: "resolve", type: evt.data.event });
           break;
-        case 'toggleMinimizeUi':
-          this.$store.dispatch('toggleIsUiMinimized')
-            .then(() => evt.ports[0].postMessage({
-              event: 'resolve', type: evt.data.event,
-            }));
+        case "toggleMinimizeUi":
+          this.$store.dispatch("toggleIsUiMinimized").then(() =>
+            evt.ports[0].postMessage({
+              event: "resolve",
+              type: evt.data.event,
+            })
+          );
           break;
-        case 'postText':
+        case "postText":
           if (!evt.data.message) {
             evt.ports[0].postMessage({
-              event: 'reject',
+              event: "reject",
               type: evt.data.event,
-              error: 'missing message field',
+              error: "missing message field",
             });
             return;
           }
-          this.$store.dispatch(
-            'postTextMessage',
-            { type: evt.data.messageType ? evt.data.messageType : messageType, text: evt.data.message },
-          )
-            .then(() => evt.ports[0].postMessage({
-              event: 'resolve', type: evt.data.event,
-            }));
+          this.$store
+            .dispatch("postTextMessage", {
+              type: evt.data.messageType ? evt.data.messageType : messageType,
+              text: evt.data.message,
+            })
+            .then(() =>
+              evt.ports[0].postMessage({
+                event: "resolve",
+                type: evt.data.event,
+              })
+            );
           break;
-        case 'deleteSession':
-          this.$store.dispatch('deleteSession')
-            .then(() => evt.ports[0].postMessage({
-              event: 'resolve', type: evt.data.event,
-            }));
+        case "deleteSession":
+          this.$store.dispatch("deleteSession").then(() =>
+            evt.ports[0].postMessage({
+              event: "resolve",
+              type: evt.data.event,
+            })
+          );
           break;
-        case 'startNewSession':
-          this.$store.dispatch('startNewSession')
-            .then(() => evt.ports[0].postMessage({
-              event: 'resolve', type: evt.data.event,
-            }));
+        case "startNewSession":
+          this.$store.dispatch("startNewSession").then(() =>
+            evt.ports[0].postMessage({
+              event: "resolve",
+              type: evt.data.event,
+            })
+          );
           break;
-        case 'setSessionAttribute':
-          console.log(`From LexWeb: ${JSON.stringify(evt.data,null,2)}`);
-          this.$store.dispatch(
-            'setSessionAttribute',
-            { key: evt.data.key, value: evt.data.value },
-          )
-            .then(() => evt.ports[0].postMessage({
-              event: 'resolve', type: evt.data.event,
-            }));
+        case "setSessionAttribute":
+          console.log(`From LexWeb: ${JSON.stringify(evt.data, null, 2)}`);
+          this.$store
+            .dispatch("setSessionAttribute", {
+              key: evt.data.key,
+              value: evt.data.value,
+            })
+            .then(() =>
+              evt.ports[0].postMessage({
+                event: "resolve",
+                type: evt.data.event,
+              })
+            );
           break;
-        case 'confirmLogin':
+        case "confirmLogin":
           this.loginConfirmed(evt);
           this.userNameValue = this.userName();
           break;
-        case 'confirmLogout':
+        case "confirmLogout":
           this.logoutConfirmed();
           break;
         default:
-          console.warn('unknown message in messageHandler', evt);
+          console.warn("unknown message in messageHandler", evt);
           break;
       }
     },
     componentMessageHandler(evt) {
       switch (evt.detail.event) {
-        case 'confirmLogin':
+        case "confirmLogin":
           this.loginConfirmed(evt);
           this.userNameValue = this.userName();
           break;
-        case 'confirmLogout':
+        case "confirmLogout":
           this.logoutConfirmed();
           break;
-        case 'ping':
-          this.$store.dispatch(
-            'sendMessageToParentWindow',
-            { event: 'pong' },
-          );
+        case "ping":
+          this.$store.dispatch("sendMessageToParentWindow", { event: "pong" });
           break;
-        case 'postText':
-          this.$store.dispatch(
-            'postTextMessage',
-            { type: 'human', text: evt.detail.message },
-          );
+        case "postText":
+          this.$store.dispatch("postTextMessage", {
+            type: "human",
+            text: evt.detail.message,
+          });
           break;
-        case 'replaceCreds':
-          this.$store.dispatch(
-            'initCredentials',
-            evt.detail.creds,
-          );
+        case "replaceCreds":
+          this.$store.dispatch("initCredentials", evt.detail.creds);
           break;
         default:
-          console.warn('unknown message in componentMessageHandler', evt);
+          console.warn("unknown message in componentMessageHandler", evt);
           break;
       }
     },
@@ -494,51 +514,60 @@ export default {
     },
     logRunningMode() {
       if (!this.$store.state.isRunningEmbedded) {
-        console.info('running in standalone mode');
+        console.info("running in standalone mode");
         return;
       }
 
-      console.info(
-        'running in embedded mode from URL: ',
-        document.location.href,
-      );
-      console.info('referrer (possible parent) URL: ', document.referrer);
-      console.info(
-        'config parentOrigin:',
-        this.$store.state.config.ui.parentOrigin,
-      );
-      if (!document.referrer
-        .startsWith(this.$store.state.config.ui.parentOrigin)
+      // console.info(
+      //   "running in embedded mode from URL: ",
+      //   document.location.href
+      // );
+      // console.info("referrer (possible parent) URL: ", document.referrer);
+      // console.info(
+      //   "config parentOrigin:",
+      //   this.$store.state.config.ui.parentOrigin
+      // );
+      if (
+        !document.referrer.startsWith(this.$store.state.config.ui.parentOrigin)
       ) {
         console.warn(
-          'referrer origin: [%s] does not match configured parent origin: [%s]',
-          document.referrer, this.$store.state.config.ui.parentOrigin,
+          "referrer origin: [%s] does not match configured parent origin: [%s]",
+          document.referrer,
+          this.$store.state.config.ui.parentOrigin
         );
       }
     },
     initConfig() {
-      if (this.$store.state.config.urlQueryParams.lexWebUiEmbed !== 'true') {
-        document.addEventListener('lexwebuicomponent', this.componentMessageHandler, false);
-        this.$store.commit('setIsRunningEmbedded', false);
-        this.$store.commit('setAwsCredsProvider', 'cognito');
+      if (this.$store.state.config.urlQueryParams.lexWebUiEmbed !== "true") {
+        document.addEventListener(
+          "lexwebuicomponent",
+          this.componentMessageHandler,
+          false
+        );
+        this.$store.commit("setIsRunningEmbedded", false);
+        this.$store.commit("setAwsCredsProvider", "cognito");
       } else {
-        window.addEventListener('message', this.messageHandler, false);
-        this.$store.commit('setIsRunningEmbedded', true);
-        this.$store.commit('setAwsCredsProvider', 'parentWindow');
+        window.addEventListener("message", this.messageHandler, false);
+        this.$store.commit("setIsRunningEmbedded", true);
+        this.$store.commit("setAwsCredsProvider", "parentWindow");
       }
 
       // get config
-      return this.$store.dispatch('initConfig', this.$lexWebUi.config)
-        .then(() => this.$store.dispatch('getConfigFromParent'))
-        // avoid merging an empty config
-        .then(config => (
-          (Object.keys(config).length) ?
-            this.$store.dispatch('initConfig', config) : Promise.resolve()
-        ))
-        .then(() => {
-          this.setFocusIfEnabled();
-          this.logRunningMode();
-        });
+      return (
+        this.$store
+          .dispatch("initConfig", this.$lexWebUi.config)
+          .then(() => this.$store.dispatch("getConfigFromParent"))
+          // avoid merging an empty config
+          .then((config) =>
+            Object.keys(config).length
+              ? this.$store.dispatch("initConfig", config)
+              : Promise.resolve()
+          )
+          .then(() => {
+            this.setFocusIfEnabled();
+            this.logRunningMode();
+          })
+      );
     },
     setFocusIfEnabled() {
       if (this.$store.state.config.ui.directFocusToBotInput) {

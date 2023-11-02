@@ -33,71 +33,74 @@
 // TODO turn this into a class
 
 // get env shortname to require file
-const envShortName = [
-  'dev',
-  'prod',
-  'test',
-].find(env => process.env.NODE_ENV.startsWith(env));
+const envShortName = ["dev", "prod", "test"].find((env) =>
+  process.env.NODE_ENV.startsWith(env)
+);
 
 if (!envShortName) {
-  console.error('unknown environment in config: ', process.env.NODE_ENV);
+  console.error("unknown environment in config: ", process.env.NODE_ENV);
 }
 
 // eslint-disable-next-line import/no-dynamic-require
-const configEnvFile = (process.env.BUILD_TARGET === 'lib') ?
-  {} : require(`./config.${envShortName}.json`);
+const configEnvFile =
+  process.env.BUILD_TARGET === "lib"
+    ? {}
+    : require(`./config.${envShortName}.json`);
 
 // default config used to provide a base structure for
 // environment and dynamic configs
 const configDefault = {
   // AWS region
-  region: 'us-east-1',
+  region: "us-east-1",
 
   cognito: {
     // Cognito pool id used to obtain credentials
     // e.g. poolId: 'us-east-1:deadbeef-cac0-babe-abcd-abcdef01234',
-    poolId: '',
+    poolId: "",
   },
   connect: {
     // The Connect contact flow id - user configured via CF template
-    contactFlowId: '',
+    contactFlowId: "",
     // The Connect instance id - user configured via CF template
-    instanceId: '',
+    instanceId: "",
     // The API Gateway Endpoint - provisioned by CF template
-    apiGatewayEndpoint: '',
+    apiGatewayEndpoint: "",
     // Message to prompt the user for a name prior to establishing a session
-    promptForNameMessage: 'Before starting a live chat, please tell me your name?',
+    promptForNameMessage:
+      "Before starting a live chat, please tell me your name?",
     // The default message to message to display while waiting for a live agent
-    waitingForAgentMessage: "Thanks for waiting. An agent will be with you when available.",
+    waitingForAgentMessage:
+      "Thanks for waiting. An agent will be with you when available.",
     // The default interval with which to display the waitingForAgentMessage. When set to 0
     // the timer is disabled.
     waitingForAgentMessageIntervalSeconds: 60,
     // Terms to start live chat
-    liveChatTerms: 'live chat',
+    liveChatTerms: "live chat",
     // The delay to use between sending transcript blocks to connect
     transcriptMessageDelayInMsec: 150,
   },
   lex: {
     // Lex V2 fields
-    v2BotId: '',
-    v2BotAliasId: '',
-    v2BotLocaleId: '',
+    v2BotId: "",
+    v2BotAliasId: "",
+    v2BotLocaleId: "",
 
     // Lex bot name
-    botName: 'WebUiOrderFlowers',
+    botName: "WebUiOrderFlowers",
 
     // Lex bot alias/version
-    botAlias: '$LATEST',
+    botAlias: "$LATEST",
 
     // instruction message shown in the UI
-    initialText: 'You can ask me for help ordering flowers. ' +
+    initialText:
+      "You can ask me for help ordering flowers. " +
       'Just type "order flowers" or click on the mic and say it.',
 
     // instructions spoken when mic is clicked
     initialSpeechInstruction: 'Say "Order Flowers" to get started',
 
     // initial Utterance to send to bot if defined
-    initialUtterance: '',
+    initialUtterance: "",
 
     // Lex initial sessionAttributes
     sessionAttributes: {},
@@ -139,12 +142,12 @@ const configDefault = {
   },
 
   polly: {
-    voiceId: 'Joanna',
+    voiceId: "Joanna",
   },
 
   ui: {
     // this dynamicall changes the pageTitle injected at build time
-    pageTitle: 'Order Flowers Bot',
+    pageTitle: "Amazon Lex 2",
 
     // when running as an embedded iframe, this will be used as the
     // be the parent origin used to send/receive messages
@@ -153,24 +156,24 @@ const configDefault = {
     // avoid making it '*'
     // if left as an empty string, it will be set to window.location.window
     // to allow runing embedded in a single origin setup
-    parentOrigin: null,
+    parentOrigin: "http://localhost:3003/",
 
     // mp3 audio file url for message send sound FX
-    messageSentSFX: 'send.mp3',
+    messageSentSFX: "send.mp3",
 
     // mp3 audio file url for message received sound FX
-    messageReceivedSFX: 'received.mp3',
+    messageReceivedSFX: "received.mp3",
 
     // chat window text placeholder
-    textInputPlaceholder: 'Type here or click on the mic',
+    textInputPlaceholder: "Chatbot Lex Jr - Amazon Lex V2... ",
 
     // text shown when you hover over the minimized bot button
-    minButtonContent: '',
+    minButtonContent: "",
 
-    toolbarColor: 'red',
+    toolbarColor: "orange",
 
     // chat window title
-    toolbarTitle: 'Order Flowers',
+    toolbarTitle: "Amazon Lex 2",
 
     // toolbar menu start live chat label
     toolbarStartLiveChatLabel: "Start Live Chat",
@@ -185,10 +188,10 @@ const configDefault = {
     toolbarEndLiveChatIcon: "call_end",
 
     // logo used in toolbar - also used as favicon not specified
-    toolbarLogo: '',
+    toolbarLogo: "",
 
     // fav icon
-    favIcon: '',
+    favIcon: "",
 
     // controls if the Lex initialText will be pushed into the message
     // list after the bot dialog is done (i.e. fail or fulfilled)
@@ -213,10 +216,10 @@ const configDefault = {
     showMessageDate: true,
 
     // bot avatar image URL
-    avatarImageUrl: '',
+    avatarImageUrl: "",
 
     // agent avatar image URL ( if live Chat is enabled)
-    agentAvatarImageUrl: '',
+    agentAvatarImageUrl: "",
 
     // Show the diaglog state icon, check or alert, in the text bubble
     showDialogStateIcon: true,
@@ -225,11 +228,11 @@ const configDefault = {
     hideButtonMessageBubble: false,
 
     // shows a thumbs up and thumbs down button which can be clicked
-    positiveFeedbackIntent: '',
-    negativeFeedbackIntent: '',
+    positiveFeedbackIntent: "",
+    negativeFeedbackIntent: "",
 
     // shows a help button on the toolbar when true
-    helpIntent: '',
+    helpIntent: "",
 
     // allowsConfigurableHelpContent - adding default content disables sending the helpIntent message.
     // content can be added per locale as needed. responseCard is optional.
@@ -252,8 +255,7 @@ const configDefault = {
     //         }
     //       }
     //     }
-    helpContent: {
-    },
+    helpContent: {},
 
     // for instances when you only want to show error icons and feedback
     showErrorIcon: true,
@@ -363,23 +365,25 @@ const configDefault = {
  */
 function getUrlQueryParams(url) {
   try {
-    return url
-      .split('?', 2) // split query string up to a max of 2 elems
-      .slice(1, 2) // grab what's after the '?' char
-      // split params separated by '&'
-      .reduce((params, queryString) => queryString.split('&'), [])
-      // further split into key value pairs separated by '='
-      .map(params => params.split('='))
-      // turn into an object representing the URL query key/vals
-      .reduce((queryObj, param) => {
-        const [key, value = true] = param;
-        const paramObj = {
-          [key]: decodeURIComponent(value),
-        };
-        return { ...queryObj, ...paramObj };
-      }, {});
+    return (
+      url
+        .split("?", 2) // split query string up to a max of 2 elems
+        .slice(1, 2) // grab what's after the '?' char
+        // split params separated by '&'
+        .reduce((params, queryString) => queryString.split("&"), [])
+        // further split into key value pairs separated by '='
+        .map((params) => params.split("="))
+        // turn into an object representing the URL query key/vals
+        .reduce((queryObj, param) => {
+          const [key, value = true] = param;
+          const paramObj = {
+            [key]: decodeURIComponent(value),
+          };
+          return { ...queryObj, ...paramObj };
+        }, {})
+    );
   } catch (e) {
-    console.error('error obtaining URL query parameters', e);
+    console.error("error obtaining URL query parameters", e);
     return {};
   }
 }
@@ -389,9 +393,9 @@ function getUrlQueryParams(url) {
  */
 function getConfigFromQuery(query) {
   try {
-    return (query.lexWebUiConfig) ? JSON.parse(query.lexWebUiConfig) : {};
+    return query.lexWebUiConfig ? JSON.parse(query.lexWebUiConfig) : {};
   } catch (e) {
-    console.error('error parsing config from URL query', e);
+    console.error("error parsing config from URL query", e);
     return {};
   }
 }
@@ -416,7 +420,7 @@ export function mergeConfig(baseConfig, srcConfig, deep = false) {
     }
 
     // deep merge in both directions using recursion
-    if (shouldMergeDeep && typeof base[key] === 'object') {
+    if (shouldMergeDeep && typeof base[key] === "object") {
       return {
         ...mergeConfig(src[key], base[key], shouldMergeDeep),
         ...mergeConfig(base[key], src[key], shouldMergeDeep),
@@ -425,19 +429,21 @@ export function mergeConfig(baseConfig, srcConfig, deep = false) {
 
     // shallow merge key/values
     // overriding the base values with the ones from the source
-    return (typeof base[key] === 'object') ?
-      { ...base[key], ...src[key] } :
-      src[key];
+    return typeof base[key] === "object"
+      ? { ...base[key], ...src[key] }
+      : src[key];
   }
 
   // use the baseConfig first level keys as the base for merging
-  return Object.keys(baseConfig)
-    .map((key) => {
-      const value = mergeValue(baseConfig, srcConfig, key, deep);
-      return { [key]: value };
-    })
-    // merge key values back into a single object
-    .reduce((merged, configItem) => ({ ...merged, ...configItem }), {});
+  return (
+    Object.keys(baseConfig)
+      .map((key) => {
+        const value = mergeValue(baseConfig, srcConfig, key, deep);
+        return { [key]: value };
+      })
+      // merge key values back into a single object
+      .reduce((merged, configItem) => ({ ...merged, ...configItem }), {})
+  );
 }
 
 // merge build time parameters

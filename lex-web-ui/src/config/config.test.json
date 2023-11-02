@@ -3,9 +3,9 @@
     "poolId": ""
   },
   "connect": {
-    "contactFlowId" : "",
-    "instanceId" : "",
-    "apiGatewayEndpoint" : ""
+    "contactFlowId": "",
+    "instanceId": "",
+    "apiGatewayEndpoint": ""
   },
   "lex": {
     "botName": "WebUiOrderFlowers",
@@ -17,8 +17,8 @@
   },
   "ui": {
     "parentOrigin": "http://localhost:8080",
-    "pageTitle": "Order Flowers Bot",
-    "toolbarTitle": "Order Flowers"
+    "pageTitle": "Amazon Lex V2",
+    "toolbarTitle": "Amazon Lex V2"
   },
   "recorder": {
     "preset": "speech_recognition"
