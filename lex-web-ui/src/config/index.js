@@ -156,7 +156,7 @@ const configDefault = {
     // avoid making it '*'
     // if left as an empty string, it will be set to window.location.window
     // to allow runing embedded in a single origin setup
-    parentOrigin: "http://localhost:3003/",
+    parentOrigin: "",
 
     // mp3 audio file url for message send sound FX
     messageSentSFX: "send.mp3",
@@ -165,7 +165,7 @@ const configDefault = {
     messageReceivedSFX: "received.mp3",
 
     // chat window text placeholder
-    textInputPlaceholder: "Chatbot Lex Jr - Amazon Lex V2... ",
+    textInputPlaceholder: "Chatbot Lex Jr",
 
     // text shown when you hover over the minimized bot button
     minButtonContent: "",
